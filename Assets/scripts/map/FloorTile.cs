@@ -20,7 +20,6 @@ public class FloorTile : MonoBehaviour
 		if (other.gameObject.tag == "Player")
 		{
 			Player collidingPlayer = other.GetComponent<Player>();
-			Debug.Log(collidingPlayer, gameObject);
 			// Si me pisa mi dueño, me voy
 			if (owner == Owner.PLAYER1 && collidingPlayer.Number == 1 || owner == Owner.PLAYER2 && collidingPlayer.Number == 2)
 				return;

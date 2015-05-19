@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
 
 	void Start()
 	{
-		Messenger.AddListener(GameManager.EVENT_GAME_OVER, OnGameFinished);
+		Messenger.AddListener<MatchResult>(GameManager.EVENT_GAME_OVER, OnGameFinished);
 	}
 
 	// Update is called once per frame
@@ -46,8 +46,9 @@ public class Player : MonoBehaviour
 			_controller.StartJump();
 	}
 
-	void OnGameFinished()
+	void OnGameFinished(MatchResult result)
 	{
 		_shouldUpdate = false;
+		_controller.SetSpeed(new Vector2(0, 0));
 	}
 }

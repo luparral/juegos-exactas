@@ -4,14 +4,12 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
 	static public string EVENT_GAME_OVER = "GameOver";
-
-	static public string TEXT_PLAYER1_WINS = "Player 1 Wins!";
-	static public string TEXT_PLAYER2_WINS = "Player 2 Wins!";
-	static public string TEXT_TIE = "Tie!";
+	static public string EVENT_TICK = "Tick";
 
 	public int Player1Blocks = 0;
 	public int Player2Blocks = 0;
 
+	// Tiempo en segundos
 	public float MatchTime = 30f;
 
 	public bool Ongoing = true;
@@ -20,7 +18,8 @@ public class GameManager : MonoBehaviour
 	{
 		Messenger.AddListener<FloorTile.Owner>(FloorTile.EVENT_PLAYER_GAINED_TILE, OnPlayerGainedTile);
 		Messenger.AddListener<FloorTile.Owner>(FloorTile.EVENT_PLAYER_LOST_TILE, OnPlayerLostTile);
-		Messenger.AddListener(EVENT_GAME_OVER, OnTimerFinished);
+
+		StartCoroutine("ClockTick");
 	}
 
 	// Update is called once per frame
@@ -28,43 +27,29 @@ public class GameManager : MonoBehaviour
 	{
 		if (!Ongoing)
 			return;
-
-		MatchTime -= Time.deltaTime;
-
-		if (MatchTime <= 0)
-		{
-			Messenger.Broadcast(EVENT_GAME_OVER);
-		}
-		else
-		{
-			// Update UI?
-		}
 	}
 
-	int GetWinner()
+	private IEnumerator ClockTick()
+	{
+		do
+		{
+			MatchTime--;
+			Messenger.Broadcast<float>(EVENT_TICK, MatchTime);
+			yield return new WaitForSeconds(1f);
+		} while (MatchTime > 0);
+
+		Messenger.Broadcast<MatchResult>(EVENT_GAME_OVER, GetResult());
+	}
+
+	MatchResult GetResult()
 	{
 		if (Player1Blocks > Player2Blocks)
-			return 1;
+			return MatchResult.PLAYER1_WINS;
 
 		if (Player2Blocks > Player1Blocks)
-			return 2;
+			return MatchResult.PLAYER2_WINS;
 
-		return 0;
-	}
-
-	void OnTimerFinished()
-	{
-		Ongoing = false;
-
-		int winner = GetWinner();
-
-		if (winner == 0)
-		{
-			Messenger.Broadcast(EVENT_GAME_OVER, TEXT_TIE);
-			return;
-		}
-
-		Messenger.Broadcast(EVENT_GAME_OVER, winner == 1 ? TEXT_PLAYER1_WINS : TEXT_PLAYER2_WINS);
+		return MatchResult.TIE;
 	}
 
 	void OnPlayerLostTile(FloorTile.Owner player)
@@ -100,4 +85,11 @@ public class GameManager : MonoBehaviour
 				break;
 		}
 	}
+}
+
+public enum MatchResult
+{
+	PLAYER1_WINS,
+	PLAYER2_WINS,
+	TIE
 }
