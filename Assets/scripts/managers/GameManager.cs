@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
 
 	void OnPlayerGainedTile(FloorTile.Owner player)
 	{
-				switch (player)
+		switch (player)
 		{
 			case FloorTile.Owner.NOBODY:
 				break;

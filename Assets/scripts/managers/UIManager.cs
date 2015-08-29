@@ -17,11 +17,16 @@ public class UIManager : MonoBehaviour
 		_resultText = GameObject.Find("ResultText").GetComponent<Text>();
 	}
 
-	// Use this for initialization
-	void Start()
+	void OnEnable()
 	{
 		Messenger.AddListener<float>(GameManager.EVENT_TICK, OnTimeChanged);
 		Messenger.AddListener<MatchResult>(GameManager.EVENT_GAME_OVER, OnGameOver);
+	}
+
+	// Use this for initialization
+	void Start()
+	{
+		
 	}
 
 	void OnTimeChanged(float currentTime)
